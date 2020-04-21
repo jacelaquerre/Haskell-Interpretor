@@ -1,4 +1,4 @@
-module HWFinal where
+module Final where
 
 
 --Jace Laquerre & Chris McCabe
