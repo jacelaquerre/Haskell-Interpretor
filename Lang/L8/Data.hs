@@ -1,4 +1,4 @@
-module Lang.L8.Data where
+module Lang.L.Data where
 
 import Data.Map (Map)
 import Data.Set (Set)
@@ -7,9 +7,9 @@ import Data.Set (Set)
 -- EXPRESSIONS --
 -----------------
 
-data Expr = 
+data Expr =
     IntE Integer
-  | PlusE Expr Expr 
+  | PlusE Expr Expr
   | BoolE Bool
   | IfE Expr Expr Expr
   | VarE String
@@ -20,7 +20,7 @@ data Expr =
 -- CONCRETE SEMANTICS --
 ------------------------
 
-data Value = 
+data Value =
     IntV Integer
   | BoolV Bool
   deriving (Eq,Ord,Show)
@@ -33,19 +33,19 @@ type Answer = Maybe Value
 -- ABSTRACT SEMANTICS --
 ------------------------
 
-data IntegerHat = 
+data IntegerHat =
     BotIH
   | RangeIH Integer Integer -- invariant (RangeIH lb ub): lb ≤ ub
   deriving (Eq,Ord,Show)
 
 type BoolHat = Set Bool
 
-data ValueHat = 
+data ValueHat =
     ValueHat IntegerHat BoolHat
   deriving (Eq,Ord,Show)
 
 type EnvHat = Map String ValueHat
 
-data AnswerHat = 
+data AnswerHat =
     AnswerHat Bool ValueHat
   deriving (Eq,Ord,Show)

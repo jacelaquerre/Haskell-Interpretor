@@ -1,4 +1,4 @@
-{-# LANGUAGE 
+{-# LANGUAGE
     ConstraintKinds
    ,DataKinds
    ,ExplicitNamespaces
@@ -31,16 +31,16 @@
    ,UndecidableInstances
    ,UndecidableSuperClasses
    ,UnicodeSyntax
-   ,ViewPatterns 
+   ,ViewPatterns
    ,DeriveLift #-}
 
-module Lang.L8.Util where
+module Lang.L.Util where
 
 import UVMHS
 
 import Util.Lex
 
-import Lang.L8.Data
+import Lang.L.Data
 
 import qualified Prelude as HS
 import qualified Language.Haskell.TH.Syntax as QQ
@@ -145,6 +145,6 @@ quoteExpr cs = do
   [| e |]
 
 l8 ∷ QQ.QuasiQuoter
-l8 = QQ.QuasiQuoter quoteExpr (const $ HS.fail $ chars "quote pattern - I can't even") 
-                              (const $ HS.fail $ chars "quote type - I can't even") 
+l8 = QQ.QuasiQuoter quoteExpr (const $ HS.fail $ chars "quote pattern - I can't even")
+                              (const $ HS.fail $ chars "quote type - I can't even")
                               (const $ HS.fail $ chars "quote dec - I can't even")
