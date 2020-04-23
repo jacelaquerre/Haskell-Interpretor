@@ -1,0 +1,11 @@
+TEST
+
+let tu1 = left 2 in
+let tu2 = right true in
+let r1 = case tu1 {left x ⇒ x * x} {right x ⇒ if x then 1 else 2} in
+let r2 = case tu2 {left x ⇒ x * x} {right x ⇒ if x then 1 else 2} in
+r1 + r2
+
+EXPECTED
+
+5

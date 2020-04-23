@@ -1,0 +1,8 @@
+TEST
+
+let p = (4+2, 1+4) in
+snd p + fst p * snd p
+
+EXPECTED
+
+55

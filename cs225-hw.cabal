@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f3a4488968269dc6cfcfe823f9f31194f845e5c24c7eeb36477098d848e48892
+-- hash: 430fd49a31ea51bcdd37f9e51efd9badf03222284ca9d7ec6980ebcb5c021a87
 
 name:           cs225-hw
 version:        1.0
@@ -13,7 +13,6 @@ build-type:     Simple
 library
   exposed-modules:
       FP
-      HW01
       Lang.L1
       Lang.L1.Data
       Lang.L1.Util
