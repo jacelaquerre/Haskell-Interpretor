@@ -1,0 +1,22 @@
+name: cs225-hw
+version: 1.0
+
+default-extensions: ScopedTypeVariables
+ghc-options: 
+  - -W 
+  - -Wno-orphans 
+  - -Wno-partial-type-signatures 
+  - -Wno-unused-imports 
+  - -Werror=incomplete-patterns
+  - -j
+
+library:
+  source-dirs: src
+  dependencies: 
+    - base 
+    - containers
+    - deepseq
+    - directory
+    - template-haskell
+    - text
+    - uvmhs

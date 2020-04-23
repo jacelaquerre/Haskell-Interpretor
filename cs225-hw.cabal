@@ -1,0 +1,36 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: f3a4488968269dc6cfcfe823f9f31194f845e5c24c7eeb36477098d848e48892
+
+name:           cs225-hw
+version:        1.0
+build-type:     Simple
+
+library
+  exposed-modules:
+      FP
+      HW01
+      Lang.L1
+      Lang.L1.Data
+      Lang.L1.Util
+      Util.Lex
+      Util.Testing
+  other-modules:
+      Paths_cs225_hw
+  hs-source-dirs:
+      src
+  default-extensions: ScopedTypeVariables
+  ghc-options: -W -Wno-orphans -Wno-partial-type-signatures -Wno-unused-imports -Werror=incomplete-patterns -j
+  build-depends:
+      base
+    , containers
+    , deepseq
+    , directory
+    , template-haskell
+    , text
+    , uvmhs
+  default-language: Haskell2010
