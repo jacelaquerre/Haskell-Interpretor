@@ -36,12 +36,12 @@ interp env e = case e of
   L1.TUnionE le re -> error "TODO"
 
 
-testE1 :: Test
-testE1 = TestDir
-  ( "E1"
+test :: Test
+test = TestDir
+  ( "Tests"
   , "interp"
   , uncurry interp
-  , "tests/fp/e1"
+  , "tests/fp/"
   , parseTest (pPar L1.pEnv L1.pExpr) L1.pAnswer
   )
 
