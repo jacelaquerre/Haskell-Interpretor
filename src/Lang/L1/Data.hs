@@ -11,9 +11,12 @@ data Expr =
   | LetE String Expr Expr
   -- NEW
   -- e ∈ exp ⩴ … | (e,e)
-  | PairE (Expr, Expr)
+  | PairE Expr Expr
   -- e ∈ exp ⩴ … | left e | right e
-  | TUnionE Expr Expr
+  | TUnionLE String Expr
+  | TUnionRE String Expr
+  -- e ∈ exp ⩴ … | case e {left x ⇒ e} {right x ⇒ e}
+  | CaseE Expr String Expr String Expr
   deriving (Eq,Ord,Show)
 
 ---------------
@@ -25,14 +28,16 @@ data Value =
   | BoolV Bool
   -- NEW
   -- v ∈ value ⩴ … | (v,v)
-  | PairV (Value, Value)
+  | PairV Value Value
   -- v ∈ value ⩴ … | left v | right v
-  | TUnionV Value Value
+  | TUnionLV String Value
+  | TUnionRV String Value
   deriving (Eq,Ord,Show)
 
 type Env = Map String Value
 
 data Answer =
   ValueA Value
+  -- | PairA (Answer, Answer)
   | BadA
   deriving (Eq,Ord,Show)

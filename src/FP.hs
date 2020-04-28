@@ -32,26 +32,29 @@ interp env e = case e of
     _ -> L1.BadA
   -- ⟦(e₁,e₂)⟧(γ) ≜ (v₁,v₂)           -- ⟦fst e⟧(γ) ≜ v₁
   --where                             -- where (v₁,v₂) = ⟦e⟧(γ)
-  --  v₁ = ⟦e₁⟧(γ)                    -- ⟦snd e⟧(γ) ≜ v₂
+  --  v₁ = ⟦e₁⟧(γ)                    -- ⟦snd e⟧(γ) ≜
   --  v₂ = ⟦e₂⟧(γ)                    -- where (v₁,v₂) = ⟦e⟧(γ)
-  L1.PairE (e1, e2) -> (interp env e1, interp env e2)
-
+  L1.PairE e1 e2 -> case (interp env e1, interp env e2) of
+    L1.ValueA (L1.PairV (v1 v2)) -> L1.ValueA (L1.PairV (v1 v2))
+    _ -> L1.BadA
   -- ⟦left e⟧(γ) ≜ left v       -- ⟦case e₁ {left x₁ ⇒ e₂} {right x₂ ⇒ e₃}⟧(γ) ≜ ⟦e₂⟧(γ[x₁↦v])
   -- where                      -- where left v = ⟦e₁⟧(γ)
   --  v = ⟦e⟧(γ)                -- ⟦case e₁ {left x₁ ⇒ e₂} {right x₂ ⇒ e₃}⟧(γ) ≜ ⟦e₃⟧(γ[x₂↦v])
                                 -- where right v = ⟦e₁⟧(γ)
-  L1.TUnionE le re -> error "TODO"
+  L1.TUnionLE x e -> error "TODO"
+  L1.TUnionRE x e -> error "TODO"
+  L1.CaseE e1 x1 e2 x2 e3 -> error "TODO"
 
 
 
-test :: Test
-test = TestDir
-  ( "Tests"
-  , "interp"
-  , uncurry interp
-  , "tests/fp/"
-  , parseTest (pPar L1.pEnv L1.pExpr) L1.pAnswer
-  )
+--test :: Test
+--test = TestDir
+--  ( "Tests"
+--  , "interp"
+--  , interp
+--  , [let p = (1*1, 2+2) in
+--  fst p * fst p + snd p]
+--  )
 
 main :: IO ()
 main = runTests []
