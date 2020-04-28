@@ -7,6 +7,8 @@ data Expr =
   | PlusE Expr Expr
   | TimesE Expr Expr
   | BoolE Bool
+  | VarE String
+  | LetE String Expr Expr
   -- NEW
   -- e ∈ exp ⩴ … | (e,e)
   | PairE (Expr, Expr)

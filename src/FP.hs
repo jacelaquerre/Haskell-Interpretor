@@ -24,6 +24,12 @@ interp env e = case e of
     (L1.ValueA (L1.IntV i1), L1.ValueA (L1.IntV i2)) -> L1.ValueA (L1.IntV (i1 * i2))
     _ -> L1.BadA
   L1.BoolE b -> L1.ValueA (L1.BoolV b)
+  L1.VarE x -> case Map.lookup x env of
+    Just v -> L1.ValueA v
+    Nothing -> L1.BadA
+  L1.LetE x e1 e2 -> case interpWithEnv env e1 of
+    L1.ValueA v -> interpWithEnv (Map.insert x v env) e2
+    _ -> L1.BadA
   -- ⟦(e₁,e₂)⟧(γ) ≜ (v₁,v₂)           -- ⟦fst e⟧(γ) ≜ v₁
   --where                             -- where (v₁,v₂) = ⟦e⟧(γ)
   --  v₁ = ⟦e₁⟧(γ)                    -- ⟦snd e⟧(γ) ≜ v₂
