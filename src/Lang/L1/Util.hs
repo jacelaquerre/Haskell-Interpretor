@@ -147,7 +147,6 @@ pType = cpNewContext "type" $ mixfix $ concat
   , mixTerminal $ do cpSyntax "bool" ; return IntT
   , mixInfixL (𝕟64 level_TIMES) $ do cpSyntax "*" ; return PairT
   , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "+" ; return TUnionT
-  , mixTerminal $ do cpSyntax "string" ; return StringT
   ]
 
 pLoc ∷ CParser TokenBasic ℤ
@@ -170,7 +169,6 @@ pValue = cpNewContext "value" $ mixfix $ concat
       return v'
   , mixPrefix (𝕟64 level_APP) $ do cpSyntax "left" ; return LeftV
   , mixPrefix (𝕟64 level_APP) $ do cpSyntax "right" ; return RightV
-  , mixTerminal $ do s ← cpString ; return $ StringV $ chars s
   ]
 
 pAnswer ∷ CParser TokenBasic Answer

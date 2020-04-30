@@ -19,7 +19,6 @@ data Expr =
   | RightE (Maybe Type) Expr
   -- e ∈ exp ⩴ … | case e {left x ⇒ e} {right x ⇒ e}
   | CaseE Expr String Expr String Expr
-  | StringE String
   deriving (Eq,Ord,Show)
 
 data Type =
@@ -27,10 +26,7 @@ data Type =
   | BoolT
   | PairT Type Type
   | TUnionT Type Type
-  | StringT
   deriving (Eq,Ord,Show)
-
--- type Right = Expr
 
 ---------------
 -- SEMANTICS --
@@ -45,7 +41,6 @@ data Value =
   -- v ∈ value ⩴ … | left v | right v
   | LeftV Value
   | RightV Value
-  | StringV String
   deriving (Eq,Ord,Show)
 
 type Env = Map String Value
