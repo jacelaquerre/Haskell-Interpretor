@@ -1,4 +1,4 @@
-{-# LANGUAGE 
+{-# LANGUAGE
     ConstraintKinds
    ,DataKinds
    ,ExplicitNamespaces
@@ -31,7 +31,7 @@
    ,UndecidableInstances
    ,UndecidableSuperClasses
    ,UnicodeSyntax
-   ,ViewPatterns 
+   ,ViewPatterns
    ,DeriveLift #-}
 
 module Util.Lex where
@@ -51,16 +51,17 @@ lexer ∷ Lexer CharClass ℂ TokenClassBasic ℕ64 TokenBasic
 lexer = lexerBasic puns kws prim ops
   where
     puns = list ["(",")","{","}","[","]","<",">",".",",",";",":","=","->","=>","<-","<=","!","#"]
-    kws = list 
+    kws = list
       [ "TEST","EXPECTED","AND"
       , "let","in","if","then","else"
       , "object"
       , "def"
-      , "do"
       , "nothing"
       , "fun"
       , "box"
+      , "exe"
       , "class","fields","method","end","new","object"
+      , "fst","snd","left","right","case","while","do","throw","try","catch"
       ]
     prim = list ["true","false","bad","loc","_|_"]
     ops = list ["+","-","*","/","<?",">?","<=?",">=?","=?","/=?","||","&&"]
@@ -125,10 +126,10 @@ pMany ∷ CParser TokenBasic a → CParser TokenBasic [a]
 pMany = tohs ^∘ cpMany
 
 pMaybe ∷ CParser TokenBasic a → CParser TokenBasic (HS.Maybe a)
-pMaybe xM = tries 
-  [ do cpSyntax "nothing" 
-       return HS.Nothing 
-  , HS.Just ^$ xM 
+pMaybe xM = tries
+  [ do cpSyntax "nothing"
+       return HS.Nothing
+  , HS.Just ^$ xM
   ]
 
 pTest ∷ CParser TokenBasic a → CParser TokenBasic b → CParser TokenBasic (a,b)
@@ -140,5 +141,8 @@ pTest pA pB = cpNewContext "test" $ concat
        return (e,a)
   ]
 
+lexAndParseIO ∷ (Pretty a) ⇒ CParser TokenBasic a → 𝕊 → IO a
+lexAndParseIO p = parseIO p *∘ tokenizeIO lexer ∘ tokens
+
 parseTest ∷ (Pretty a,Pretty b) ⇒ CParser TokenBasic a → CParser TokenBasic b → 𝕊 → IO (a,b)
-parseTest pA pB = parseIO (pTest pA pB) *∘ tokenizeIO lexer ∘ tokens
+parseTest pA pB = lexAndParseIO $ pTest pA pB

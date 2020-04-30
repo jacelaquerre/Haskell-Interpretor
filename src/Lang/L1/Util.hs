@@ -46,37 +46,131 @@ import qualified Prelude as HS
 import qualified Language.Haskell.TH.Syntax as QQ
 import qualified Language.Haskell.TH.Quote as QQ
 
+import Data.Map (Map)
 import qualified Data.Map as Map
 
+import Data.Set (Set)
+import qualified Data.Set as Set
+
 makePrettySum ''Expr
+makePrettySum ''Type
 makePrettySum ''Value
 makePrettySum ''Answer
 
+instance (QQ.Lift a) ⇒ QQ.Lift (Set a) where
+  lift xs =
+    let xs' = Set.toList xs
+    in [| Set.fromList xs' |]
+
+instance (QQ.Lift k,QQ.Lift v) ⇒ QQ.Lift (Map k v) where
+  lift kvs =
+    let kvs' = Map.toList kvs
+    in [| Map.fromList kvs' |]
+
 deriving instance QQ.Lift Expr
+deriving instance QQ.Lift Type
 deriving instance QQ.Lift Value
 deriving instance QQ.Lift Answer
 
+level_LET        = 1
+level_ASSIGN     = 2
+level_TUPLE      = 5
+level_ARROW      = 10
+level_PLUS       = 11
+level_TIMES      = 12
+level_APP        = 21
+level_UNBOX      = 22
+level_ACCESS     = 23
+
+
 pExpr ∷ CParser TokenBasic Expr
 pExpr = cpNewContext "expression" $ mixfix $ concat
-  [ mixTerminal $ do cpSyntax "(" ; e ← pExpr ; cpSyntax ")" ; return e
-  , mixTerminal $ do i ← cpInteger ; return $ IntE i
-  , mixInfixL (𝕟64 2) $ do cpSyntax "+" ; return PlusE
-  , mixInfixL (𝕟64 3) $ do cpSyntax "*" ; return TimesE
+  -- [ mixTerminal $ do cpSyntax "(" ; e ← pExpr ; cpSyntax ")" ; return e
+  [ mixTerminal $ do i ← cpInteger ; return $ IntE i
+  , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "+" ; return PlusE
   , mixTerminal $ do b ← pBool ; return $ BoolE b
-  , mixTerminal $ do x ← pVar ; return $ VarE x
-  , mixPrefix (𝕟64 1) $ do
+  , mixPrefix (𝕟64 level_LET) $ do
       cpSyntax "let"
       x ← pVar
       cpSyntax "="
       e ← pExpr
       cpSyntax "in"
       return $ LetE x e
+  , mixPrefix (𝕟64 level_LET) $ do
+      cpSyntax "mut"
+      e ← pExpr
+      cpSyntax "in"
+      return $ LetE (chars "_") e
+  , mixTerminal $ do
+      cpSyntax "("
+      e ← pExpr
+      e' ← tries
+        [ do cpSyntax ","
+             es ← cpOneOrMoreSepBy (cpSyntax ",") pExpr
+             return $ foldOnFrom es e $ \ eᵢ eₐ → PairE eₐ eᵢ
+        , do return e
+        ]
+      cpSyntax ")"
+      return e'
+  , mixPrefix (𝕟64 level_APP) $ do cpSyntax "fst" ; return FstE
+  , mixPrefix (𝕟64 level_APP) $ do cpSyntax "snd" ; return SndE
+  , mixPrefix (𝕟64 level_APP) $ do
+      cpSyntax "left"
+      τO ← tohs ^$ cpOptional pType
+      return $ LeftE τO
+  , mixPrefix (𝕟64 level_APP) $ do
+      cpSyntax "right"
+      τO ← tohs ^$ cpOptional pType
+      return $ RightE τO
+  , mixTerminal $ do
+      cpSyntax "case"
+      e₁ ← pExpr
+      cpSyntax "{"
+      cpSyntax "left"
+      x₁ ← pVar
+      cpSyntax "=>"
+      e₂ ← pExpr
+      cpSyntax "}"
+      cpSyntax "{"
+      cpSyntax "left"
+      x₂ ← pVar
+      cpSyntax "=>"
+      e₃ ← pExpr
+      cpSyntax "}"
+      return $ CaseE e₁ x₁ e₂ x₂ e₃
   ]
 
+pType ∷ CParser TokenBasic Type
+pType = cpNewContext "type" $ mixfix $ concat
+  [ mixTerminal $ do cpSyntax "(" ; τ ← pType ; cpSyntax ")" ; return τ
+  , mixTerminal $ do cpSyntax "int" ; return IntT
+  , mixTerminal $ do cpSyntax "bool" ; return IntT
+  , mixInfixL (𝕟64 level_TIMES) $ do cpSyntax "*" ; return PairT
+  , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "+" ; return TUnionT
+  , mixTerminal $ do cpSyntax "string" ; return StringT
+  ]
+
+pLoc ∷ CParser TokenBasic ℤ
+pLoc = do cpSyntax "loc" ; cpInteger
+
 pValue ∷ CParser TokenBasic Value
-pValue = cpNewContext "value" $ concat
-  [ do i ← cpInteger ; return $ IntV i
-  , do b ← pBool ; return $ BoolV b
+pValue = cpNewContext "value" $ mixfix $ concat
+  [ mixTerminal $ do i ← cpInteger ; return $ IntV i
+  , mixTerminal $ do b ← pBool ; return $ BoolV b
+  , mixTerminal $ do
+      cpSyntax "("
+      v ← pValue
+      v' ← tries
+        [ do cpSyntax ","
+             vs ← cpOneOrMoreSepBy (cpSyntax ",") pValue
+             return $ foldOnFrom vs v $ \ vᵢ vₐ → PairV vₐ vᵢ
+        , do return v
+        ]
+      cpSyntax ")"
+      return v'
+  , mixPrefix (𝕟64 level_APP) $ do cpSyntax "left" ; return LeftV
+  , mixPrefix (𝕟64 level_APP) $ do cpSyntax "right" ; return RightV
+  , mixTerminal $ do s ← cpString ; return $ StringV $ chars s
   ]
 
 pAnswer ∷ CParser TokenBasic Answer
@@ -86,15 +180,7 @@ pAnswer = cpNewContext "answer" $ concat
   ]
 
 pEnv ∷ CParser TokenBasic Env
-pEnv = cpNewContext "env" $ do
-  cpSyntax "{"
-  xvs ← cpManySepBy (cpSyntax ",") $ do
-    x ← pVar
-    cpSyntax "="
-    v ← pValue
-    return (x,v)
-  cpSyntax "}"
-  return $ Map.fromList $ tohs xvs
+pEnv = pMap pVar pValue
 
 parseExpr ∷ 𝕊 → IO Expr
 parseExpr = parseIO pExpr *∘ tokenizeIO lexer ∘ tokens
@@ -105,6 +191,7 @@ quoteExpr cs = do
   [| e |]
 
 l1 ∷ QQ.QuasiQuoter
-l1 = QQ.QuasiQuoter quoteExpr (const $ HS.fail $ chars "quote pattern - I can't even")
-                                (const $ HS.fail $ chars "quote type - I can't even")
-                                (const $ HS.fail $ chars "quote dec - I can't even")
+l1 = QQ.QuasiQuoter (\ cs → do e ← QQ.runIO $ lexAndParseIO pExpr $ string cs ; [| e |])
+                     (const $ HS.fail $ chars "quote pattern - I can't even")
+                     (const $ HS.fail $ chars "quote type - I can't even")
+                     (const $ HS.fail $ chars "quote dec - I can't even")

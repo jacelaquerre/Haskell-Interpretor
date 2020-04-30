@@ -4,20 +4,33 @@ import Data.Map (Map)
 
 data Expr =
     IntE Integer
+  | BoolE Bool
   | PlusE Expr Expr
   | TimesE Expr Expr
-  | BoolE Bool
   | VarE String
   | LetE String Expr Expr
   -- NEW
   -- e ∈ exp ⩴ … | (e,e)
   | PairE Expr Expr
+  | FstE Expr
+  | SndE Expr
   -- e ∈ exp ⩴ … | left e | right e
-  | TUnionLE String Expr
-  | TUnionRE String Expr
+  | LeftE (Maybe Type) Expr
+  | RightE (Maybe Type) Expr
   -- e ∈ exp ⩴ … | case e {left x ⇒ e} {right x ⇒ e}
   | CaseE Expr String Expr String Expr
+  | StringE String
   deriving (Eq,Ord,Show)
+
+data Type =
+    IntT
+  | BoolT
+  | PairT Type Type
+  | TUnionT Type Type
+  | StringT
+  deriving (Eq,Ord,Show)
+
+-- type Right = Expr
 
 ---------------
 -- SEMANTICS --
@@ -30,14 +43,14 @@ data Value =
   -- v ∈ value ⩴ … | (v,v)
   | PairV Value Value
   -- v ∈ value ⩴ … | left v | right v
-  | TUnionLV String Value
-  | TUnionRV String Value
+  | LeftV Value
+  | RightV Value
+  | StringV String
   deriving (Eq,Ord,Show)
 
 type Env = Map String Value
 
 data Answer =
   ValueA Value
-  -- | PairA (Answer, Answer)
   | BadA
   deriving (Eq,Ord,Show)

@@ -35,26 +35,32 @@ interp env e = case e of
   --  v₁ = ⟦e₁⟧(γ)                    -- ⟦snd e⟧(γ) ≜
   --  v₂ = ⟦e₂⟧(γ)                    -- where (v₁,v₂) = ⟦e⟧(γ)
   L1.PairE e1 e2 -> case (interp env e1, interp env e2) of
-    L1.ValueA (L1.PairV (v1 v2)) -> L1.ValueA (L1.PairV (v1 v2))
+    L1.PairA (L1.PairV (v1 v2)) -> L1.PairA (L1.PairV (v1 v2))
     _ -> L1.BadA
   -- ⟦left e⟧(γ) ≜ left v       -- ⟦case e₁ {left x₁ ⇒ e₂} {right x₂ ⇒ e₃}⟧(γ) ≜ ⟦e₂⟧(γ[x₁↦v])
   -- where                      -- where left v = ⟦e₁⟧(γ)
   --  v = ⟦e⟧(γ)                -- ⟦case e₁ {left x₁ ⇒ e₂} {right x₂ ⇒ e₃}⟧(γ) ≜ ⟦e₃⟧(γ[x₂↦v])
                                 -- where right v = ⟦e₁⟧(γ)
-  L1.TUnionLE x e -> error "TODO"
-  L1.TUnionRE x e -> error "TODO"
+  L1.LeftE e t -> error "TODO"
+  L1.RightE t e -> error "TODO"
   L1.CaseE e1 x1 e2 x2 e3 -> error "TODO"
 
 
 
---test :: Test
---test = TestDir
---  ( "Tests"
---  , "interp"
---  , interp
---  , [let p = (1*1, 2+2) in
---  fst p * fst p + snd p]
---  )
+test1 :: Test
+test1 = TestDir
+  ( "T1"                 -- e.g., "T1"
+  , "identity function"  -- e.g., "interp"
+  , id                   -- the function, e.g., (\ e -> interp e Map.empty Map.empty)
+  , "tests/fp"           -- the directory where tests live, e.g., "tests/fp/t1"
+  , parseTest LM.pExpr LM.pExpr
+  )
 
 main :: IO ()
-main = runTests []
+main = do
+  putStrLn "TESTS"
+  runTests
+    [ test1
+    ]
+  putStrLn "EXAMPLE"
+  putStrLn (show [lme| let p = (1,2) in fst p |])
