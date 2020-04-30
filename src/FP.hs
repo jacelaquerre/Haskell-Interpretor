@@ -62,16 +62,16 @@ interp env e = case e of
   -- where right v = ⟦e₁⟧(γ)
   L1.CaseE e1 x1 e2 x2 e3 -> error "TODO"
 
--- translate:: Mega.Expr -> Expr
 
- test1 :: Test
- test1 = TestDir
-   ( "T1"                 -- e.g., "T1"
-   , "identity function"  -- e.g., "interp"
-   , id                   -- the function, e.g., (\ e -> interp e Map.empty Map.empty)
-   , "tests/fp"           -- the directory where tests live, e.g., "tests/fp/t1"
-   , parseTest L1.pEnv L1.pExpr
-   )
+test1 :: Test
+test1 = TestDir
+  ( "T1"                 -- e.g., "T1"
+  , "identity function"  -- e.g., "interp"
+  , id                   -- the function, e.g., (\ e -> interp e Map.empty Map.empty)
+  , "tests/fp"           -- the directory where tests live, e.g., "tests/fp/t1"
+  , parseTest L1.pExpr L1.pExpr
+  -- (pPair L1.pEnv L1.pExpr) L1.pAnswer
+  )
 
 main :: IO ()
 main = do
