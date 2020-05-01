@@ -11,6 +11,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 
 import Util.Testing
+import Util.Lex
 import qualified Lang.L1 as L1
 
 
@@ -34,10 +35,11 @@ interp env e = case e of
   --where
   --  v₁ = ⟦e₁⟧(γ)
   --  v₂ = ⟦e₂⟧(γ)
-  L1.PairE e1 e2 -> error "TODO"
-  --L1.PairE e1 e2 -> case (interp env e1, interp env e2) of
-  --  L1.ValueA (v1 v2) -> L1.ValueA (L1.PairV (v1 v2))
-  --  _ -> L1.BadA
+  L1.PairE e1 e2 -> case interp env e1 of
+    L1.ValueA v1 -> case interp env e2 of
+        L1.ValueA v2 -> L1.ValueA (L1.PairV v1 v2)
+        _ -> L1.BadA
+    _  -> L1.BadA
   -- ⟦fst e⟧(γ) ≜ v₁
   -- where (v₁,v₂) = ⟦e⟧(γ)
   L1.FstE e -> case interp env e of
@@ -51,11 +53,15 @@ interp env e = case e of
   -- ⟦left e⟧(γ) ≜ left v
   -- where
   --  v = ⟦e⟧(γ)
-  L1.LeftE e t -> error "TODO"
+  L1.LeftE t e -> case interp env e of
+    L1.ValueA (L1.LeftV v) -> L1.ValueA (L1.LeftV v)
+    _ -> L1.BadA
   -- ⟦left e⟧(γ) ≜ left v
   --  where
   --   v = ⟦e⟧(γ)
-  L1.RightE t e -> error "TODO"
+  L1.RightE t e -> case interp env e of
+    L1.ValueA (L1.LeftV v) -> L1.ValueA (L1.LeftV v)
+    _ -> L1.BadA
   -- ⟦case e₁ {left x₁ ⇒ e₂} {right x₂ ⇒ e₃}⟧(γ) ≜ ⟦e₂⟧(γ[x₁↦v])
   -- where left v = ⟦e₁⟧(γ)
   -- ⟦case e₁ {left x₁ ⇒ e₂} {right x₂ ⇒ e₃}⟧(γ) ≜ ⟦e₃⟧(γ[x₂↦v])

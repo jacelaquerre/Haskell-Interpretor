@@ -15,7 +15,7 @@ data Expr =
   | FstE Expr
   | SndE Expr
   -- e ∈ exp ⩴ … | left e | right e
-  | LeftE (Maybe Type) Expr
+  | LeftE (Maybe Type) Expr 
   | RightE (Maybe Type) Expr
   -- e ∈ exp ⩴ … | case e {left x ⇒ e} {right x ⇒ e}
   | CaseE Expr String Expr String Expr
