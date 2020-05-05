@@ -90,6 +90,13 @@ pExpr = cpNewContext "expression" $ mixfix $ concat
   , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "+" ; return PlusE
   , mixTerminal $ do b ← pBool ; return $ BoolE b
   , mixPrefix (𝕟64 level_LET) $ do
+      cpSyntax "if"
+      e₁ ← pExpr
+      cpSyntax "then"
+      e₂ ← pExpr
+      cpSyntax "else"
+      return $ IfE e₁ e₂
+  , mixPrefix (𝕟64 level_LET) $ do
       cpSyntax "let"
       x ← pVar
       cpSyntax "="
@@ -188,8 +195,32 @@ quoteExpr cs = do
   e ← QQ.runIO $ parseExpr $ string cs
   [| e |]
 
-l1 ∷ QQ.QuasiQuoter
-l1 = QQ.QuasiQuoter (\ cs → do e ← QQ.runIO $ lexAndParseIO pExpr $ string cs ; [| e |])
+lme ∷ QQ.QuasiQuoter
+lme = QQ.QuasiQuoter (\ cs → do e ← QQ.runIO $ lexAndParseIO pExpr $ string cs ; [| e |])
+                     (const $ HS.fail $ chars "quote pattern - I can't even")
+                     (const $ HS.fail $ chars "quote type - I can't even")
+                     (const $ HS.fail $ chars "quote dec - I can't even")
+
+lmt ∷ QQ.QuasiQuoter
+lmt = QQ.QuasiQuoter (\ cs → do τ ← QQ.runIO $ lexAndParseIO pType $ string cs ; [| τ |])
+                     (const $ HS.fail $ chars "quote pattern - I can't even")
+                     (const $ HS.fail $ chars "quote type - I can't even")
+                     (const $ HS.fail $ chars "quote dec - I can't even")
+
+lmv ∷ QQ.QuasiQuoter
+lmv = QQ.QuasiQuoter (\ cs → do v ← QQ.runIO $ lexAndParseIO pValue $ string cs ; [| v |])
+                     (const $ HS.fail $ chars "quote pattern - I can't even")
+                     (const $ HS.fail $ chars "quote type - I can't even")
+                     (const $ HS.fail $ chars "quote dec - I can't even")
+
+lma ∷ QQ.QuasiQuoter
+lma = QQ.QuasiQuoter (\ cs → do a ← QQ.runIO $ lexAndParseIO pAnswer $ string cs ; [| a |])
+                     (const $ HS.fail $ chars "quote pattern - I can't even")
+                     (const $ HS.fail $ chars "quote type - I can't even")
+                     (const $ HS.fail $ chars "quote dec - I can't even")
+
+lmg ∷ QQ.QuasiQuoter
+lmg = QQ.QuasiQuoter (\ cs → do γ ← QQ.runIO $ lexAndParseIO pEnv $ string cs ; [| γ |])
                      (const $ HS.fail $ chars "quote pattern - I can't even")
                      (const $ HS.fail $ chars "quote type - I can't even")
                      (const $ HS.fail $ chars "quote dec - I can't even")

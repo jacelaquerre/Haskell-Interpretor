@@ -63,7 +63,7 @@ lexer = lexerBasic puns kws prim ops
       , "class","fields","method","end","new","object"
       , "fst","snd","left","right","case","while","do","throw","try","catch"
       ]
-    prim = list ["true","false","bad","loc","_|_"]
+    prim = list ["true","false","bad","loc","_|_","int","bool"]
     ops = list ["+","-","*","/","<?",">?","<=?",">=?","=?","/=?","||","&&"]
 
 pBool ∷ CParser TokenBasic 𝔹

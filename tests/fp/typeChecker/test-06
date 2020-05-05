@@ -1,0 +1,7 @@
+TEST
+
+right int 1
+
+EXPECTED
+
+int + int
