@@ -92,8 +92,9 @@ typeChecker e env = case e of
   -- ⦇e₁ + e₂⦈(Γ) ≜ int
     -- where int = ⦇e₁⦈(Γ)
           -- int = ⦇e₂⦈(Γ)
-  L1.PlusE e1 e2 -> case (typeChecker e1 env, typeChecker e2 env) of
-    Just (L1.IntT) -> Just (L1.IntT)
+  -- L1.PlusE e1 e2 -> case (typeChecker e1 env, typeChecker e2 env) of
+  --   Just (L1.IntT) -> Just (L1.IntT)
+  L1.PlusE e1 e2 -> error "TODO"
   L1.TimesE e1 e2 -> error "TODO"
   -- ⦇if e₁ then e₂ else e₃⦈(Γ) ≜ τ
   -- where bool = ⦇e₁⦈(Γ)
@@ -133,5 +134,3 @@ main = do
     [ test1,
       test2
     ]
-  --putStrLn "EXAMPLE"
-  --putStrLn (show [lme| let p = (1,2) in fst p |])
