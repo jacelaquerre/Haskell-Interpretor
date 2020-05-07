@@ -77,7 +77,7 @@ interp env e = case e of
 test1 :: Test
 test1 = TestDir
   ( "T1"                 -- e.g., "T1"
-  , "identity function"  -- e.g., "interp"
+  , "interp"            -- e.g., "interp"
   , id                   -- the function, e.g., (\ e -> interp e Map.empty Map.empty)
   , "tests/fp/interp"           -- the directory where tests live, e.g., "tests/fp/t1"
   , parseTest L1.pExpr L1.pExpr
@@ -119,7 +119,7 @@ typeChecker e env = case e of
 test2 :: Test
 test2 = TestDir
   ( "T1"
-  , "identity function"
+  , "typeChecker"
   , id
   , "tests/fp/typeChecker"
   , parseTest L1.pExpr L1.pExpr
