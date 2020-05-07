@@ -88,6 +88,7 @@ pExpr = cpNewContext "expression" $ mixfix $ concat
   -- [ mixTerminal $ do cpSyntax "(" ; e ← pExpr ; cpSyntax ")" ; return e
   [ mixTerminal $ do i ← cpInteger ; return $ IntE i
   , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "+" ; return PlusE
+  , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "*" ; return TimesE
   , mixTerminal $ do b ← pBool ; return $ BoolE b
   , mixPrefix (𝕟64 level_LET) $ do
       cpSyntax "if"
