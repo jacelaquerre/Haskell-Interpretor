@@ -1,0 +1,7 @@
+TEST
+
+left true bool
+
+EXPECTED
+
+bool + bool

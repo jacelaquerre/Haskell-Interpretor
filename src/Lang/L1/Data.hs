@@ -25,8 +25,10 @@ data Expr =
 data Type =
     IntT
   | BoolT
+  | StringT
   | PairT Type Type
   | TUnionT Type Type
+  | BadT
   deriving (Eq,Ord,Show)
 
 ---------------
