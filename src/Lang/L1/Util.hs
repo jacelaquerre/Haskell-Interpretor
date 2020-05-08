@@ -90,6 +90,7 @@ pExpr = cpNewContext "expression" $ mixfix $ concat
   , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "+" ; return PlusE
   , mixInfixL (𝕟64 level_PLUS) $ do cpSyntax "*" ; return TimesE
   , mixTerminal $ do b ← pBool ; return $ BoolE b
+  , mixTerminal $ do x ← pVar ; return $ VarE x
   , mixPrefix (𝕟64 level_LET) $ do
       cpSyntax "if"
       e₁ ← pExpr
@@ -130,22 +131,22 @@ pExpr = cpNewContext "expression" $ mixfix $ concat
       cpSyntax "right"
       τO ← tohs ^$ cpOptional pType
       return $ RightE τO
-  , mixTerminal $ do
-      cpSyntax "case"
-      e₁ ← pExpr
-      cpSyntax "{"
-      cpSyntax "left"
-      x₁ ← pVar
-      cpSyntax "=>"
-      e₂ ← pExpr
-      cpSyntax "}"
-      cpSyntax "{"
-      cpSyntax "left"
-      x₂ ← pVar
-      cpSyntax "=>"
-      e₃ ← pExpr
-      cpSyntax "}"
-      return $ CaseE e₁ x₁ e₂ x₂ e₃
+      , mixTerminal $ do
+          cpSyntax "case"
+          e₁ ← pExpr
+          cpSyntax "{"
+          cpSyntax "left"
+          x₁ ← pVar
+          cpSyntax "=>"
+          e₂ ← pExpr
+          cpSyntax "}"
+          cpSyntax "{"
+          cpSyntax "right"
+          x₂ ← pVar
+          cpSyntax "=>"
+          e₃ ← pExpr
+          cpSyntax "}"
+          return $ CaseE e₁ x₁ e₂ x₂ e₃
   ]
 
 pType ∷ CParser TokenBasic Type
